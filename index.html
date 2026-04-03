@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HerShield - AI Women Safety</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/icons/icon-192.png">
+    <meta name="theme-color" content="#dc3545">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="sw.js" defer></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i>
+            <h2>HerShield</h2>
+        </div>
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Home Screen -->
+    <div id="home-screen" class="screen active">
+        <header>
+            <div class="status-bar">
+                <span class="time" id="time"></span>
+                <div class="battery">
+                    <span id="battery-level">85%</span>
+                    <i class="fas fa-battery-full"></i>
+                </div>
+            </div>
+            <div class="header-content">
+                <h1><i class="fas fa-shield-alt"></i> HerShield</h1>
+                <p>Stay Safe Always</p>
+            </div>
+        </header>
+
+        <main>
+            <!-- SOS Button -->
+            <div class="sos-container">
+                <button id="sos-btn" class="sos-btn">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>🚨 SOS</span>
+                </button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="actions-grid">
+                <button class="action-btn" data-screen="timer">
+                    <i class="fas fa-clock"></i>
+                    <span>Safety Timer</span>
+                </button>
+                <button class="action-btn" data-screen="risk">
+                    <i class="fas fa-brain"></i>
+                    <span>AI Risk Check</span>
+                </button>
+                <button class="action-btn" data-screen="nearby">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Nearby Help</span>
+                </button>
+                <button class="action-btn fake-call">
+                    <i class="fas fa-phone"></i>
+                    <span>Fake Call</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Timer Screen -->
+    <div id="timer-screen" class="screen">
+        <div class="back-btn" onclick="showScreen('home')">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="timer-container">
+            <h2>Safety Timer</h2>
+            <div class="timer-display" id="timer-display">20:00</div>
+            <div class="timer-status" id="timer-status">Check-in required in 20 minutes</div>
+            <button id="safe-btn" class="safe-btn">
+                <i class="fas fa-check"></i>
+                I'm Safe
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Screen -->
+    <div id="alert-screen" class="screen">
+        <div class="alert-animation">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <i class="fas fa-exclamation-triangle alert-icon"></i>
+        </div>
+        <div class="alert-content">
+            <h2 id="alert-status">🚨 EMERGENCY TRIGGERED</h2>
+            <div id="alert-progress">
+                <div class="progress-item">
+                    <span>📍 Location Shared</span>
+                    <div class="progress-bar active"></div>
+                </div>
+                <div class="progress-item">
+                    <span>📱 Alert to Contacts</span>
+                    <div class="progress-bar"></div>
+                </div>
+                <div class="progress-item">
+                    <span>🎥 Recording Evidence</span>
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+            <div class="location-info" id="location-info" style="display:none;">
+                <p><strong>Location:</strong> 19.0760° N, 72.8777° E</p>
+                <p><strong>Address:</strong> Dadar, Mumbai</p>
+            </div>
+            <button class="call-police-btn" onclick="callEmergency()">
+                <i class="fas fa-phone"></i> Call Police (100)
+            </button>
+        </div>
+    </div>
+
+    <!-- Risk Screen -->
+    <div id="risk-screen" class="screen">
+        <div class="back-btn" onclick="showScreen('home')">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="risk-container">
+            <div class="analyzing" id="analyzing">
+                <i class="fas fa-brain spinner-icon"></i>
+                <h3>AI Analyzing Risk...</h3>
+            </div>
+            <div class="risk-result" id="risk-result" style="display:none;">
+                <div class="risk-card" id="risk-card">
+                    <div class="risk-icon" id="risk-icon">
+                        <i class="fas fa-shield-check"></i>
+                    </div>
+                    <div class="risk-score" id="risk-score">25%</div>
+                    <div class="risk-level" id="risk-level">LOW RISK</div>
+                    <div class="risk-message" id="risk-message"></div>
+                </div>
+            </div>
+            <button class="recheck-btn" onclick="checkRisk()" style="display:none;" id="recheck-btn">
+                Recheck Risk
+            </button>
+        </div>
+    </div>
+
+    <!-- Nearby Help Screen -->
+    <div id="nearby-screen" class="screen">
+        <div class="back-btn" onclick="showScreen('home')">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="nearby-container">
+            <h2><i class="fas fa-map-marker-alt"></i> Nearby Help</h2>
+            <div class="help-list" id="help-list">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Fake Call Screen -->
+    <div id="fake-call-screen" class="screen full-screen">
+        <div class="call-container">
+            <div class="call-header">
+                <span class="call-status" id="call-status">Incoming Call...</span>
+            </div>
+            <div class="caller-info">
+                <div class="caller-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="caller-details">
+                    <h3>Mom</h3>
+                    <span>+91 98765 43210</span>
+                </div>
+            </div>
+            <div class="call-actions">
+                <button class="call-decline" onclick="endFakeCall()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <button class="call-accept" onclick="endFakeCall()">
+                    <i class="fas fa-phone"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
